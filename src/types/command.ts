@@ -8,6 +8,26 @@ interface CommandInput {
     actionTarget?: Target;
 }
 
+/**
+ * Represents a command in the Dungeon Commander game.
+ * 
+ * @class Command
+ * @property {Target} target - The primary target of the command.
+ * @property {string} conditions - The conditions under which the command is executed. TODO: Define conditions.
+ * @property {string} action - The action to be performed by the command. TODO: Define actions.
+ * @property {Target} [actionTarget] - An optional secondary target for the action.
+ * 
+ * @constructor
+ * @param {CommandInput} input - The input parameters for the command.
+ * 
+ * @method identifyTarget
+ * @private
+ * @param {Target} target - The target to identify.
+ * @param {State} state - The current state of the game.
+ * @param {{id: number, side: 'party' | 'enemies'}} actor - The actor performing the command.
+ * @returns {Array<{id: number, side: 'party' | 'enemies'}>} - An array of identified targets.
+ * @throws {Error} Throws an error if the target base is invalid.
+ */
 export class Command {
     target: Target;
     conditions: string; // TODO: define conditions

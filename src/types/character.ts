@@ -1,4 +1,5 @@
-
+import { Command } from "./command";
+import { State } from "./state";
 // The character's current stats
 export interface statBlock {
     hp: number;
@@ -40,11 +41,12 @@ interface characterInput {
     statBlock: statBlock;
     growthRates: growthRates;
     actions?: string[];
-    commands?: string[];
+    commands?: Command[];
     level?: number;
     exp?: number;
     equipment?: string[]; // to be implemented later
     resistances?: resistances;
+    side: 'party' | 'enemies';
 }
 
 // The character's resistances to various damage types. These values will be multipliers for damage taken from each type
@@ -72,7 +74,7 @@ const defaultResistances: resistances = {
 }
 
 // The types of damage that can be dealt
-type DamageType = 'physical' | 'fire' | 'ice' | 'lightning' | 'earth' | 'water' | 'wind' | 'light' | 'dark';
+export type DamageType = 'physical' | 'fire' | 'ice' | 'lightning' | 'earth' | 'water' | 'wind' | 'light' | 'dark';
 
 
 /**
@@ -121,11 +123,12 @@ description: string;
 statBlock: statBlock;
 growthRates: growthRates;
 actions: string[];
-commands: string[];
+commands: Command[];
 level: number;
 exp: number;
 equipment?: string[]; // to be implemented later
 resistances: resistances;
+side: 'party' | 'enemies';
 isAlive: boolean;
 
 constructor (input: characterInput) {
@@ -142,6 +145,7 @@ constructor (input: characterInput) {
     this.equipment = input.equipment || [];
     this.resistances = input.resistances || defaultResistances;
     this.isAlive = true;
+    this.side = input.side;
 }
 
 private calculateDamage (damage: number, type:DamageType) {
@@ -167,6 +171,26 @@ public heal (amount: number) {
         this.statBlock.hp = this.statBlock.maxHp;
     }
     console.log(`${this.name} has been healed for ${amount} HP!`);
+}
+// TODO: refine this method
+
+public basicAttack(target: Character) {
+    const damage = this.statBlock.strength;
+    target.takeDamage(damage, 'physical');
+}
+public chooseAction(state: State) {
+let actions:Command[] = [];
+ this.commands.forEach((command) => {
+    if(command.checkConditions(state, {id: this.id, side: this.side})) {
+        actions.push(command);
+    }
+     
+ }) 
+ // replace this with a basic attack if no actions are available
+ if (actions.length === 0) {
+     return;
+}
+actions[0].pushToActive(state, {id: this.id, side: this.side});  
 }
 
 }

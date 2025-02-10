@@ -1,3 +1,4 @@
+import { handleStatusEffect, statusEffectInput } from "../handlers/effectHandlers";
 import { Action } from "./action";
 import { Character } from "./character";
 
@@ -10,7 +11,13 @@ interface characterState {
 interface actionState {
  context: Record<string, unknown>;
  action: Action;
- initalTick: number;
+ initialTick: number;
+}
+
+interface effectState {
+    effect: statusEffectInput;
+    initialTick: number;
+    target: Character;
 }
 
 export class State {
@@ -21,6 +28,7 @@ export class State {
     size: {x: number, y: number};
     tickCount: number;
     activeActions: actionState[];
+    activeEffects: effectState[];
     constructor(party: Character[], enemies: Character[], size: {x: number, y: number}) {
         this.characters = {
             party: party.map((character) => ({ character, position: {x: 0, y: 0}})),
@@ -93,10 +101,60 @@ export class State {
         return 0;
     }
 
+    public addEffect(effect: statusEffectInput, target: Character) {
+        this.activeEffects.push({effect, initialTick: this.tickCount, target});
+    }
+
+    public addAction(action: Action, context: Record<string, unknown>) {
+        this.activeActions.push({action, context, initialTick: this.tickCount});
+    }
+
+    // check that this works because object comparison is weird
+    public removeEffect(effect: statusEffectInput) {
+        this.activeEffects = this.activeEffects.filter((activeEffect) => activeEffect.effect !== effect);
+    }
+    private removeAction(action: Action) {
+        this.activeActions = this.activeActions.filter((activeAction) => activeAction.action !== action);
+    }
+
+    private resolveActions() {
+        if (this.activeActions.length === 0) {
+            return;
+        }
+        this.activeActions.forEach((activeAction) => {
+        const {action, context} = activeAction
+        const result = action.effects(context);
+        if (result) {
+            this.removeAction(action);
+        }});
+    }
+
+    private resolveEffects() {
+        if (this.activeEffects.length === 0) {
+            return;
+        }
+        this.activeEffects.forEach((activeEffect) => {
+            const {effect, initialTick, target} = activeEffect;
+            const {duration, frequency, context} = effect;
+            const result = handleStatusEffect(effect, target, initialTick, this.tickCount)
+            if (result) {
+                this.removeEffect(activeEffect.effect);
+            }
+        });
+    }
+
     private tick() {
         this.tickCount++;
         // get each alive character to choose an action
+        this.characters.party.filter((character) => character.character.isAlive).forEach((character) => {
+            character.character.chooseAction(this);
+        });
+        this.characters.enemies.filter((character) => character.character.isAlive).forEach((character) => {
+            character.character.chooseAction(this);
+        });
         // advance each action and remove them if they return true
+        this.resolveActions();
+        this.resolveEffects();
         // check for win or lose conditions
         // return a different value for each condition 1 = win, 0 = continue, -1 = lose
         return this.checkResult();
@@ -105,6 +163,9 @@ export class State {
     public init() {
         this.setInitalPositions();
     }
+
+
+
     
 
     public run() {

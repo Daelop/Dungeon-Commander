@@ -1,10 +1,12 @@
+import { Action } from "./action";
+import { Condition } from "./condition";
 import { State } from "./state";
 import { Target } from "./target";
 
 interface CommandInput {
     target: Target;
-    conditions: string; // TODO: define conditions
-    action: string; // TODO: define actions
+    conditions: Condition[]; // TODO: define conditions
+    action: Action; // TODO: define actions
     actionTarget?: Target;
 }
 
@@ -30,8 +32,8 @@ interface CommandInput {
  */
 export class Command {
     target: Target;
-    conditions: string; // TODO: define conditions
-    action: string; // TODO: define actions
+    conditions: Condition[]; // TODO: define conditions
+    action: Action; // TODO: define actions
     actionTarget?: Target;
 constructor(input: CommandInput) {
     this.target = input.target;
@@ -63,5 +65,17 @@ private identifyTarget(target: Target, state: State, actor: {id: number, side: '
             throw new Error(`Invalid target base: ${target.base}`);    
         }
 }
-
+public checkConditions(state: State, actor: {id: number, side: 'party' | 'enemies'}) {
+    return this.conditions.every((condition) => condition.check(actor ,state));
+}
+// TODO: Implement the execute method
+public pushToActive(state: State, actor: {id: number, side: 'party' | 'enemies'}) {
+    let actionTarget
+    if (this.actionTarget) {
+        actionTarget = this.identifyTarget(this.actionTarget, state, actor);
+    }
+    const targets = this.identifyTarget(this.target, state, actor);
+    const context = {actionTarget, actor};
+    state.addAction(this.action, context);
+}
 }

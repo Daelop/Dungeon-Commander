@@ -2,84 +2,92 @@ import { Command } from "./command";
 import { State } from "./state";
 // The character's current stats
 export interface statBlock {
-    hp: number;
-    maxHp: number;
-    mp: number;
-    maxMp: number;
-    strength: number;
-    dexterity: number;
-    intelligence: number;
-    wisdom: number;
-    charisma: number;
-    defense: number;
-    magicDefense: number;
-    spellSpeed: number;
-    attackSpeed: number;
-    movementSpeed: number;
+  hp: number;
+  maxHp: number;
+  mp: number;
+  maxMp: number;
+  strength: number;
+  dexterity: number;
+  intelligence: number;
+  wisdom: number;
+  charisma: number;
+  defense: number;
+  magicDefense: number;
+  spellSpeed: number;
+  attackSpeed: number;
+  movementSpeed: number;
 }
 
 // The character's growth rate for each stat on level up this will likely be a multiplier rather than a flat number
 export interface growthRates {
-    maxHp: number;
-    maxMp: number;
-    strength: number;
-    dexterity: number;
-    intelligence: number;
-    wisdom: number;
-    charisma: number;
-    defense: number;
-    magicDefense: number;
-    spellSpeed: number;
-    attackSpeed: number;
-    movementSpeed: number;
+  maxHp: number;
+  maxMp: number;
+  strength: number;
+  dexterity: number;
+  intelligence: number;
+  wisdom: number;
+  charisma: number;
+  defense: number;
+  magicDefense: number;
+  spellSpeed: number;
+  attackSpeed: number;
+  movementSpeed: number;
 }
 // The input for creating a new character
 interface characterInput {
-    name: string;
-    title: string;
-    description: string;
-    statBlock: statBlock;
-    growthRates: growthRates;
-    actions?: string[];
-    commands?: Command[];
-    level?: number;
-    exp?: number;
-    equipment?: string[]; // to be implemented later
-    resistances?: resistances;
-    side: 'party' | 'enemies';
+  name: string;
+  title: string;
+  description: string;
+  statBlock: statBlock;
+  growthRates: growthRates;
+  actions?: string[];
+  commands?: Command[];
+  level?: number;
+  exp?: number;
+  equipment?: string[]; // to be implemented later
+  resistances?: resistances;
+  side: "party" | "enemies";
 }
 
 // The character's resistances to various damage types. These values will be multipliers for damage taken from each type
 interface resistances {
-    fire: number;
-    ice: number;
-    lightning: number;
-    earth: number;
-    water: number;
-    wind: number;
-    light: number;
-    dark: number;
+  fire: number;
+  ice: number;
+  lightning: number;
+  earth: number;
+  water: number;
+  wind: number;
+  light: number;
+  dark: number;
 }
 
 // The default resistances for a character
 const defaultResistances: resistances = {
-    fire: 1,
-    ice: 1,
-    lightning: 1,
-    earth: 1,
-    water: 1,
-    wind: 1,
-    light: 1,
-    dark: 1,
-}
+  fire: 1,
+  ice: 1,
+  lightning: 1,
+  earth: 1,
+  water: 1,
+  wind: 1,
+  light: 1,
+  dark: 1,
+};
 
 // The types of damage that can be dealt
-export type DamageType = 'physical' | 'fire' | 'ice' | 'lightning' | 'earth' | 'water' | 'wind' | 'light' | 'dark';
-
+export type DamageType =
+  | "physical"
+  | "fire"
+  | "ice"
+  | "lightning"
+  | "earth"
+  | "water"
+  | "wind"
+  | "light"
+  | "dark";
 
 /**
  * Represents a character in the game.
- * 
+ *
  * @class Character
  * @property {number} id - The unique identifier for the character.
  * @property {string} name - The name of the character.
@@ -94,44 +102,44 @@ export type DamageType = 'physical' | 'fire' | 'ice' | 'lightning' | 'earth' | '
  * @property {string[]} [equipment] - The list of equipment the character has (optional).
  * @property {resistances} resistances - The resistances of the character to different damage types.
  * @property {boolean} isAlive - Indicates whether the character is alive.
- * 
+ *
  * @constructor
  * @param {characterInput} input - The input object containing initial values for the character.
- * 
+ *
  * @method calculateDamage
  * @private
  * @param {number} damage - The amount of damage to be calculated.
  * @param {DamageType} type - The type of damage (e.g., physical, fire, ice, etc.).
  * @returns {number} - The calculated damage after applying defenses and resistances.
- * 
+ *
  * @method takeDamage
  * @public
  * @param {number} damage - The amount of damage to be taken.
  * @param {DamageType} type - The type of damage (e.g., physical, fire, ice, etc.).
  * @description Reduces the character's HP by the calculated damage and updates the isAlive status.
- * 
+ *
  * @method heal
  * @public
  * @param {number} amount - The amount of HP to be healed.
  * @description Increases the character's HP by the specified amount, up to the maximum HP.
  */
 export class Character {
-id: number;
-name: string;
-title: string;
-description: string;
-statBlock: statBlock;
-growthRates: growthRates;
-actions: string[];
-commands: Command[];
-level: number;
-exp: number;
-equipment?: string[]; // to be implemented later
-resistances: resistances;
-side: 'party' | 'enemies';
-isAlive: boolean;
+  id: number;
+  name: string;
+  title: string;
+  description: string;
+  statBlock: statBlock;
+  growthRates: growthRates;
+  actions: string[];
+  commands: Command[];
+  level: number;
+  exp: number;
+  equipment?: string[]; // to be implemented later
+  resistances: resistances;
+  side: "party" | "enemies";
+  isAlive: boolean;
 
-constructor (input: characterInput) {
+  constructor(input: characterInput) {
     this.id = Math.floor(Math.random() * 1000000);
     this.name = input.name;
     this.title = input.title;
@@ -146,51 +154,50 @@ constructor (input: characterInput) {
     this.resistances = input.resistances || defaultResistances;
     this.isAlive = true;
     this.side = input.side;
-}
+  }
 
-private calculateDamage (damage: number, type:DamageType) {
+  private calculateDamage(damage: number, type: DamageType) {
     // apply defense or magic defense based on damage type
-    if (type === 'physical') {
-        return damage * (1 - this.statBlock.defense / 100); // TODO: refine this formula and implement penetration
+    if (type === "physical") {
+      return damage * (1 - this.statBlock.defense / 100); // TODO: refine this formula and implement penetration
     }
-    return (damage * this.resistances[type]) * (1 - this.statBlock.magicDefense / 100); // TODO: refine this formula and implement penetration 
-}
+    return (
+      damage * this.resistances[type] * (1 - this.statBlock.magicDefense / 100)
+    ); // TODO: refine this formula and implement penetration
+  }
 
-
-public takeDamage (damage: number, type: DamageType) {
+  public takeDamage(damage: number, type: DamageType) {
     this.statBlock.hp -= this.calculateDamage(damage, type);
     if (this.statBlock.hp <= 0) {
-        this.isAlive = false;
+      this.isAlive = false;
     }
     console.log(`${this.name} has taken ${damage} ${type} damage!`);
-}
+  }
 
-public heal (amount: number) {
+  public heal(amount: number) {
     this.statBlock.hp += amount;
     if (this.statBlock.hp > this.statBlock.maxHp) {
-        this.statBlock.hp = this.statBlock.maxHp;
+      this.statBlock.hp = this.statBlock.maxHp;
     }
     console.log(`${this.name} has been healed for ${amount} HP!`);
-}
-// TODO: refine this method
+  }
+  // TODO: refine this method
 
-public basicAttack(target: Character) {
+  public basicAttack(target: Character) {
     const damage = this.statBlock.strength;
-    target.takeDamage(damage, 'physical');
-}
-public chooseAction(state: State) {
-let actions:Command[] = [];
- this.commands.forEach((command) => {
-    if(command.checkConditions(state, {id: this.id, side: this.side})) {
+    target.takeDamage(damage, "physical");
+  }
+  public chooseAction(state: State) {
+    let actions: Command[] = [];
+    this.commands.forEach((command) => {
+      if (command.checkConditions(state, { id: this.id, side: this.side })) {
         actions.push(command);
+      }
+    });
+    // replace this with a basic attack if no actions are available
+    if (actions.length === 0) {
+      return;
     }
-     
- }) 
- // replace this with a basic attack if no actions are available
- if (actions.length === 0) {
-     return;
-}
-actions[0].pushToActive(state, {id: this.id, side: this.side});  
-}
-
+    actions[0].pushToActive(state, { id: this.id, side: this.side });
+  }
 }
